@@ -3,7 +3,7 @@
   "templates_folder": "00_templates",
   "templates_pairs": [],
   "trigger_on_file_creation": true,
-  "auto_jump_to_cursor": false,
+  "auto_jump_to_cursor": true,
   "enable_system_commands": false,
   "shell_path": "",
   "user_scripts_folder": "05_script",
@@ -16,6 +16,10 @@
     {
       "folder": "03_project",
       "template": "00_templates/tag_router_template.md"
+    },
+    {
+      "folder": "",
+      "template": ""
     }
   ],
   "enable_file_templates": false,
