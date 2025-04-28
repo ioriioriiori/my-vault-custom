@@ -1,17 +1,19 @@
 /**
- * tag_router.js  (TFile チェックを extension チェックに変更)
+ * tag_router.js  (2025-04-29 final)
  * --------------------------------------------------
- * 明示マッピング / dynamicPrefix(#pjt_*) による自動振り分け
+ * 明示マッピング＋dynamicPrefix(#pjt_*) 自動振り分け
+ * - フォルダ自動生成
+ * - Obsidian 公式 API のみ使用（Templater 依存なし）
  */
 module.exports = async (tp, fileArg = null) => {
   /* ---------- 対象ファイル ---------- */
-  const file = fileArg ?? tp.file;          // TFile オブジェクト
-  if (!file) return;
-  // ↙ ここを extension チェックに変更（TFile 参照を排除）
-  if (file.extension !== 'md') return;
+  const file = fileArg ?? tp.file;
+  if (!file || file.extension !== 'md') return;
 
   /* ---------- 設定読み込み ---------- */
-  const cfg = JSON.parse(await tp.file.include('.obsidian/tag-routing.json'));
+  // ❶: include() をやめ、Vault API で JSON を読む
+  const cfgRaw = await app.vault.adapter.read('.obsidian/tag-routing.json');
+  const cfg    = JSON.parse(cfgRaw);
 
   /* ---------- タグ取得 ---------- */
   const cache = app.metadataCache.getFileCache(file);
@@ -28,22 +30,24 @@ module.exports = async (tp, fileArg = null) => {
   if (!targetDir && cfg.dynamicPrefix && cfg.dynamicBase) {
     const dyn = tags.find(t => t.startsWith(cfg.dynamicPrefix));
     if (dyn) {
-      const sub = dyn.replace(cfg.dynamicPrefix,'').replace(/[^\w\-]/g,'');
+      const sub = dyn.replace(cfg.dynamicPrefix, '').replace(/[^\w\-]/g, '');
       targetDir = `${cfg.dynamicBase}/${sub}`;
     }
   }
-  if (!targetDir) return;                   // タグ不一致
+  if (!targetDir) return;            // タグ該当なし
 
-  /* ---------- フォルダ再帰生成 ---------- */
-  const ensure = async p=>{
-    const segs=p.split('/'); let cur='';
-    for(const s of segs){ cur=cur?`${cur}/${s}`:s;
-      if(!await app.vault.adapter.exists(cur))
-        await app.vault.createFolder(cur).catch(()=>{}); }
+  /* ---------- フォルダを再帰生成 ---------- */
+  const ensure = async p => {
+    const segs = p.split('/'); let cur = '';
+    for (const s of segs) {
+      cur = cur ? `${cur}/${s}` : s;
+      if (!await app.vault.adapter.exists(cur))
+        await app.vault.createFolder(cur).catch(() => {});
+    }
   };
   await ensure(targetDir);
 
-  /* ---------- 移動 ---------- */
+  /* ---------- ファイル移動 ---------- */
   const dest = `${targetDir}/${file.basename}.md`;
   if (file.path === dest) return;
 

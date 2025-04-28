@@ -2,7 +2,6 @@
 tags:
   - note
   - pjt_test
-  - "#Concept"
 ---
 > [!IMPORTANT]
 > [[企画書の書き方]]を参照の下、企画書を書くこと。
