@@ -1,8 +1,16 @@
 {
-  "choices": [],
+  "choices": [
+    {
+      "id": "165e6d29-095a-4bcc-9827-4be975499825",
+      "name": "new_project1",
+      "type": "Macro",
+      "command": true,
+      "macroId": "26ab9ba9-95ff-41a0-90ee-1b84ad358c8b"
+    }
+  ],
   "macros": [
     {
-      "name": "New project",
+      "name": "new_project",
       "id": "26ab9ba9-95ff-41a0-90ee-1b84ad358c8b",
       "commands": [
         {
@@ -13,7 +21,7 @@
           "settings": {}
         }
       ],
-      "runOnStartup": true
+      "runOnStartup": false
     }
   ],
   "inputPrompt": "multi-line",
