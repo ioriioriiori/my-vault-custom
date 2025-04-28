@@ -1,6 +1,9 @@
 // new_project.js  – QuickAdd v1.x 用
 module.exports = async (params) => {
     // v1 では quickAddApi という名前で渡されます
+    /* ── ここを追加 ───────────────────────────── */
+    if (params?.isRunningOnStartup) return;   // 起動時なら何もしない
+    /* ──────────────────────────────────────── */
     const { quickAddApi: qa, app } = params;
   
     const slug = await qa.inputPrompt("New project slug (e.g. alpha)");

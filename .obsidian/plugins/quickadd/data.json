@@ -1,35 +1,19 @@
 {
-  "choices": [
-    {
-      "id": "898fbc2f-d6ab-4bd5-9ca2-5b49f86b42ae",
-      "name": "New project",
-      "type": "Macro",
-      "command": false,
-      "macroId": "115e6537-3dc4-48f5-8e06-81151da10f46"
-    },
-    {
-      "id": "abe6824c-9e0d-469a-9ff4-f9ef042a8832",
-      "name": "New project (copy)",
-      "type": "Macro",
-      "command": false,
-      "macroId": "115e6537-3dc4-48f5-8e06-81151da10f46"
-    }
-  ],
+  "choices": [],
   "macros": [
     {
       "name": "New project",
-      "id": "115e6537-3dc4-48f5-8e06-81151da10f46",
+      "id": "26ab9ba9-95ff-41a0-90ee-1b84ad358c8b",
       "commands": [
         {
           "name": "new_script",
           "type": "UserScript",
-          "id": "87af5e17-429f-4b74-bbd0-f104b6645ab1",
+          "id": "99fc35de-bec9-420d-af8d-7ef2d3dd2df4",
           "path": "05_script/new_script.js",
           "settings": {}
         }
       ],
-      "runOnStartup": false,
-      "hideInCommandPalette": false
+      "runOnStartup": true
     }
   ],
   "inputPrompt": "multi-line",
