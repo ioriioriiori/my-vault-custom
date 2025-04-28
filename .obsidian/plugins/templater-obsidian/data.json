@@ -12,14 +12,6 @@
     {
       "folder": "02_notes",
       "template": "00_templates/02_note.md"
-    },
-    {
-      "folder": "03_project",
-      "template": "00_templates/tag_router_template.md"
-    },
-    {
-      "folder": "",
-      "template": ""
     }
   ],
   "enable_file_templates": false,
@@ -31,11 +23,7 @@
   ],
   "syntax_highlighting": true,
   "syntax_highlighting_mobile": true,
-  "enabled_templates_hotkeys": [
-    "00_templates/start_tag_router_listener.md"
-  ],
-  "startup_templates": [
-    "00_templates/start_tag_router_listener.md"
-  ],
+  "enabled_templates_hotkeys": [],
+  "startup_templates": [],
   "intellisense_render": 1
 }
