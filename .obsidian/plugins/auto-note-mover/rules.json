@@ -1,5 +1,15 @@
 [
   {
+    "dest": "03_project/atoz",
+    "tag": "#pjt_atoz",
+    "isRegExp": false
+  },
+  {
+    "dest": "03_project/beta",
+    "tag": "#pjt_beta",
+    "isRegExp": false
+  },
+  {
     "dest": "03_project/alpha",
     "tag": "#pjt_alpha",
     "isRegExp": false

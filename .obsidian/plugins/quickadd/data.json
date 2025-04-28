@@ -2,7 +2,7 @@
   "choices": [
     {
       "id": "165e6d29-095a-4bcc-9827-4be975499825",
-      "name": "new_project1",
+      "name": "new_project",
       "type": "Macro",
       "command": true,
       "macroId": "26ab9ba9-95ff-41a0-90ee-1b84ad358c8b"
@@ -10,7 +10,7 @@
   ],
   "macros": [
     {
-      "name": "new_project",
+      "name": "new_pjt_create",
       "id": "26ab9ba9-95ff-41a0-90ee-1b84ad358c8b",
       "commands": [
         {
