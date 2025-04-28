@@ -4,52 +4,72 @@ const obsidian_1 = require("obsidian");
 
 class ProjectTagMover extends obsidian_1.Plugin {
     async onload() {
-        console.log("ProjectTagMover loading...");
+        console.log("ProjectTagMover (command version) loading...");
         await this.loadSettings();
         this.addSettingTab(new ProjectTagMoverSettingTab(this.app, this));
-        this.registerEvent(this.app.vault.on("modify", async (file) => {
-            if (!(file instanceof obsidian_1.TFile)) return;
-            if (!file.path.endsWith(".md")) return;
-            console.log("Modify detected:", file.path);
 
-            const metadata = this.app.metadataCache.getFileCache(file);
-            if (!metadata || !metadata.tags) {
-                console.log("No tags found for:", file.path);
+        // コマンド登録
+        this.addCommand({
+            id: "move-note-by-tag",
+            name: "Move Note by Tag (Project Tag Mover)",
+            callback: async () => {
+                await this.moveActiveFile();
+            },
+        });
+    }
+
+    async moveActiveFile() {
+        const file = this.app.workspace.getActiveFile();
+        if (!file) {
+            new obsidian_1.Notice("No active file.");
+            return;
+        }
+        if (!file.path.endsWith(".md")) {
+            new obsidian_1.Notice("Not a markdown file.");
+            return;
+        }
+
+        const metadata = this.app.metadataCache.getFileCache(file);
+        if (!metadata || !metadata.tags) {
+            new obsidian_1.Notice("No tags found in active file.");
+            return;
+        }
+
+        const tags = metadata.tags.map(t => t.tag);
+        console.log("Tags found:", tags);
+
+        for (const tag of tags) {
+            if (tag.startsWith(this.settings.tagPrefix)) {
+                const relativePath = tag.substring(this.settings.tagPrefix.length);
+                await this.moveFileToProject(file, relativePath);
                 return;
             }
+        }
 
-            const tags = metadata.tags.map(t => t.tag);
-            console.log("Tags found:", tags);
-
-            for (const tag of tags) {
-                console.log("Checking tag:", tag);
-                if (tag.startsWith(this.settings.tagPrefix)) {
-                    const relativePath = tag.substring(this.settings.tagPrefix.length);
-                    console.log("Matched tag! Moving to relative path:", relativePath);
-                    await this.moveFileToProject(file, relativePath);
-                    break;
-                }
-            }
-        }));
+        new obsidian_1.Notice("No matching project tag found.");
     }
 
     async moveFileToProject(file, relativePath) {
         const baseFolder = this.settings.rootFolder;
         const targetPath = `${baseFolder}/${relativePath}/${file.name}`;
+
         try {
             const folderPath = targetPath.substring(0, targetPath.lastIndexOf("/"));
             if (!(await this.app.vault.adapter.exists(folderPath))) {
                 await this.app.vault.adapter.mkdir(folderPath);
             }
+
             await this.app.fileManager.renameFile(file, targetPath);
+            new obsidian_1.Notice(`Moved to '${targetPath}'`);
             console.log(`Moved '${file.path}' to '${targetPath}'`);
         } catch (e) {
             console.error("Failed to move file:", e);
+            new obsidian_1.Notice("Failed to move file.");
         }
     }
 
     onunload() {
-        console.log("ProjectTagMover unloaded.");
+        console.log("ProjectTagMover (command version) unloaded.");
     }
 
     async loadSettings() {
