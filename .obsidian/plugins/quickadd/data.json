@@ -4,7 +4,7 @@
       "id": "898fbc2f-d6ab-4bd5-9ca2-5b49f86b42ae",
       "name": "New project",
       "type": "Macro",
-      "command": true,
+      "command": false,
       "macroId": "115e6537-3dc4-48f5-8e06-81151da10f46"
     }
   ],
@@ -21,7 +21,7 @@
           "settings": {}
         }
       ],
-      "runOnStartup": true
+      "runOnStartup": false
     }
   ],
   "inputPrompt": "single-line",
