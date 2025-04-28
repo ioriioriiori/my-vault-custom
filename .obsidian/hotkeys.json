@@ -39,5 +39,13 @@
       ],
       "key": "T"
     }
+  ],
+  "templater-obsidian:00_templates/start_tag_router_listener.md": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "T"
+    }
   ]
 }
