@@ -10,7 +10,7 @@ module.exports = (tp) => {
   
     const onModify = debounce(async (file) => {
       // md 以外／テンプレ用フォルダなどは除外
-      if (!(file instanceof TFile) || !file.path.endsWith('.md')) return;
+      if (!file || file.extension !== 'md') return;
       await tp.user.tag_router(tp, file);
     });
   

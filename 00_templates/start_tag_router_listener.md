@@ -1,4 +1,4 @@
 ---
 tags: []
 ---
-<%* await tp.user.tag_router(tp) %>
+<%* await tp.user.start_tag_router_listener(tp) %>
