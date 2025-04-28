@@ -4,7 +4,7 @@ const obsidian_1 = require("obsidian");
 
 class ProjectTagMover extends obsidian_1.Plugin {
     async onload() {
-        console.log("ProjectTagMover (final version, frontmatter強化) loading...");
+        console.log("ProjectTagMover (final-final version) loading...");
         await this.loadSettings();
         this.addSettingTab(new ProjectTagMoverSettingTab(this.app, this));
 
@@ -53,7 +53,15 @@ class ProjectTagMover extends obsidian_1.Plugin {
 
         console.log("Collected tags:", allTags);
 
-        const projectTag = allTags.find(tag => typeof tag === "string" && tag.startsWith(this.settings.tagPrefix));
+        let projectTag = null;
+        for (const tag of allTags) {
+            if (typeof tag !== "string") continue;
+            const cleanTag = tag.replace(/^["']|["']$/g, ""); // 両端のクォーテーションを除去
+            if (cleanTag.startsWith(this.settings.tagPrefix)) {
+                projectTag = cleanTag;
+                break;
+            }
+        }
 
         if (!projectTag) {
             new obsidian_1.Notice("No matching project tag found.");
@@ -84,7 +92,7 @@ class ProjectTagMover extends obsidian_1.Plugin {
     }
 
     onunload() {
-        console.log("ProjectTagMover (final version) unloaded.");
+        console.log("ProjectTagMover (final-final version) unloaded.");
     }
 
     async loadSettings() {
