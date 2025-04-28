@@ -4,11 +4,10 @@ const obsidian_1 = require("obsidian");
 
 class ProjectTagMover extends obsidian_1.Plugin {
     async onload() {
-        console.log("ProjectTagMover (command version) loading...");
+        console.log("ProjectTagMover (command, frontmatter対応版) loading...");
         await this.loadSettings();
         this.addSettingTab(new ProjectTagMoverSettingTab(this.app, this));
 
-        // コマンド登録
         this.addCommand({
             id: "move-note-by-tag",
             name: "Move Note by Tag (Project Tag Mover)",
@@ -29,24 +28,40 @@ class ProjectTagMover extends obsidian_1.Plugin {
             return;
         }
 
-        const metadata = this.app.metadataCache.getFileCache(file);
-        if (!metadata || !metadata.tags) {
-            new obsidian_1.Notice("No tags found in active file.");
+        if (!file.path.startsWith("02_note/")) {
+            new obsidian_1.Notice("Only files under '02_note/' can be moved.");
             return;
         }
 
-        const tags = metadata.tags.map(t => t.tag);
-        console.log("Tags found:", tags);
-
-        for (const tag of tags) {
-            if (tag.startsWith(this.settings.tagPrefix)) {
-                const relativePath = tag.substring(this.settings.tagPrefix.length);
-                await this.moveFileToProject(file, relativePath);
-                return;
-            }
+        const metadata = this.app.metadataCache.getFileCache(file);
+        if (!metadata) {
+            new obsidian_1.Notice("No metadata found.");
+            return;
         }
 
-        new obsidian_1.Notice("No matching project tag found.");
+        let allTags = [];
+
+        // 本文中のtags
+        if (metadata.tags) {
+            allTags.push(...metadata.tags.map(t => t.tag));
+        }
+
+        // frontmatter内のtags
+        if (metadata.frontmatter && Array.isArray(metadata.frontmatter.tags)) {
+            allTags.push(...metadata.frontmatter.tags);
+        }
+
+        console.log("Collected tags:", allTags);
+
+        const projectTag = allTags.find(tag => typeof tag === "string" && tag.startsWith(this.settings.tagPrefix));
+
+        if (!projectTag) {
+            new obsidian_1.Notice("No matching project tag found.");
+            return;
+        }
+
+        const relativePath = projectTag.substring(this.settings.tagPrefix.length);
+        await this.moveFileToProject(file, relativePath);
     }
 
     async moveFileToProject(file, relativePath) {
@@ -69,7 +84,7 @@ class ProjectTagMover extends obsidian_1.Plugin {
     }
 
     onunload() {
-        console.log("ProjectTagMover (command version) unloaded.");
+        console.log("ProjectTagMover (command, frontmatter対応版) unloaded.");
     }
 
     async loadSettings() {
