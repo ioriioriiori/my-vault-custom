@@ -4,7 +4,7 @@ const obsidian_1 = require("obsidian");
 
 class ProjectTagMover extends obsidian_1.Plugin {
     async onload() {
-        console.log("ProjectTagMover (no folder restriction version) loading...");
+        console.log("ProjectTagMover (final version, frontmatter強化) loading...");
         await this.loadSettings();
         this.addSettingTab(new ProjectTagMoverSettingTab(this.app, this));
 
@@ -42,8 +42,13 @@ class ProjectTagMover extends obsidian_1.Plugin {
         }
 
         // frontmatter内のtags
-        if (metadata.frontmatter && Array.isArray(metadata.frontmatter.tags)) {
-            allTags.push(...metadata.frontmatter.tags);
+        if (metadata.frontmatter && metadata.frontmatter.tags) {
+            const fmTags = metadata.frontmatter.tags;
+            if (Array.isArray(fmTags)) {
+                allTags.push(...fmTags);
+            } else if (typeof fmTags === "string") {
+                allTags.push(fmTags);
+            }
         }
 
         console.log("Collected tags:", allTags);
@@ -79,7 +84,7 @@ class ProjectTagMover extends obsidian_1.Plugin {
     }
 
     onunload() {
-        console.log("ProjectTagMover (no folder restriction version) unloaded.");
+        console.log("ProjectTagMover (final version) unloaded.");
     }
 
     async loadSettings() {
