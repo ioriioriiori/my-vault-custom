@@ -11,12 +11,16 @@
   "auto_jump_to_cursor": false,
   "enable_system_commands": false,
   "shell_path": "",
-  "user_scripts_folder": "",
+  "user_scripts_folder": "05_script",
   "enable_folder_templates": true,
   "folder_templates": [
     {
       "folder": "02_notes",
       "template": "00_templates/02_note.md"
+    },
+    {
+      "folder": "03_project",
+      "template": "00_templates/tag_router_template.md"
     }
   ],
   "enable_file_templates": false,
