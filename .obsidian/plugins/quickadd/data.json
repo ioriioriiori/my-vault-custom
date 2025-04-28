@@ -6,6 +6,13 @@
       "type": "Macro",
       "command": false,
       "macroId": "115e6537-3dc4-48f5-8e06-81151da10f46"
+    },
+    {
+      "id": "abe6824c-9e0d-469a-9ff4-f9ef042a8832",
+      "name": "New project (copy)",
+      "type": "Macro",
+      "command": false,
+      "macroId": "115e6537-3dc4-48f5-8e06-81151da10f46"
     }
   ],
   "macros": [
@@ -16,15 +23,16 @@
         {
           "name": "new_script",
           "type": "UserScript",
-          "id": "34303f6a-17fa-467e-be51-56bb20dda9f6",
+          "id": "87af5e17-429f-4b74-bbd0-f104b6645ab1",
           "path": "05_script/new_script.js",
           "settings": {}
         }
       ],
-      "runOnStartup": false
+      "runOnStartup": false,
+      "hideInCommandPalette": false
     }
   ],
-  "inputPrompt": "single-line",
+  "inputPrompt": "multi-line",
   "devMode": false,
   "templateFolderPath": "05_script",
   "announceUpdates": true,
