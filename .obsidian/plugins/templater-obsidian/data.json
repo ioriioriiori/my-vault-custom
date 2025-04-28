@@ -36,7 +36,7 @@
     "00_templates/10_current_time.md"
   ],
   "startup_templates": [
-    "00_templates/tag_router_template.md"
+    "05_script/start_tag_router_listener.js"
   ],
   "intellisense_render": 1
 }
