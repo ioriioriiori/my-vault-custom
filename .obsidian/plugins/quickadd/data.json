@@ -1,16 +1,32 @@
 {
-  "choices": [],
+  "choices": [
+    {
+      "id": "898fbc2f-d6ab-4bd5-9ca2-5b49f86b42ae",
+      "name": "New project",
+      "type": "Macro",
+      "command": true,
+      "macroId": "115e6537-3dc4-48f5-8e06-81151da10f46"
+    }
+  ],
   "macros": [
     {
       "name": "New project",
       "id": "115e6537-3dc4-48f5-8e06-81151da10f46",
-      "commands": [],
+      "commands": [
+        {
+          "name": "new_script",
+          "type": "UserScript",
+          "id": "34303f6a-17fa-467e-be51-56bb20dda9f6",
+          "path": "05_script/new_script.js",
+          "settings": {}
+        }
+      ],
       "runOnStartup": true
     }
   ],
   "inputPrompt": "single-line",
   "devMode": false,
-  "templateFolderPath": "00_templates",
+  "templateFolderPath": "05_script",
   "announceUpdates": true,
   "version": "1.13.2",
   "disableOnlineFeatures": true,
