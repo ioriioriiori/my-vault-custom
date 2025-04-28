@@ -1,4 +1,4 @@
-// 修正版
+// 修正版 new_project.js : Auto Note Mover data.json対応版
 module.exports = async (params) => {
   const { quickAddApi: qa, app } = params;
   const slug = await qa.inputPrompt("New project slug (e.g. alpha)");
@@ -8,28 +8,37 @@ module.exports = async (params) => {
   const base = "03_project";
   const dir = `${base}/${slug}`;
 
-  // フォルダ作成
+  // フォルダ生成
   if (!await fs.exists(dir)) await fs.mkdir(dir);
 
-  // rules.json を読む
-  const rulePath = ".obsidian/plugins/auto-note-mover/rules.json";
-  let rules = [];  // 初期は空
+  // data.json を読む
+  const rulePath = ".obsidian/plugins/auto-note-mover/data.json";
+  let data = {};  // 初期は空
   if (await fs.exists(rulePath)) {
     try {
       const raw = await fs.read(rulePath);
-      rules = JSON.parse(raw) || [];
-      if (!Array.isArray(rules)) rules = [];  // 保険
+      data = JSON.parse(raw) || {};
     } catch (e) {
-      rules = [];  // JSONパース失敗しても空に
+      data = {};
     }
   }
 
-  // 重複チェック
-  if (!rules.find(r => r.tag === `#pjt_${slug}`)) {
-    rules.unshift({ dest: dir, tag: `#pjt_${slug}`, isRegExp: false });
-    await fs.write(rulePath, JSON.stringify(rules, null, 2));
-    new Notice(`Rule added: #pjt_${slug} → ${dir}`);
+  // folder_tag_patternがなければ作る
+  if (!Array.isArray(data.folder_tag_pattern)) {
+    data.folder_tag_pattern = [];
+  }
+
+  // 同じtagルールがすでに存在するか確認
+  const tagToAdd = `#pjt_${slug}`;
+  if (!data.folder_tag_pattern.find(r => r.tag === tagToAdd)) {
+    data.folder_tag_pattern.push({
+      folder: dir,
+      tag: tagToAdd,
+      pattern: ""
+    });
+    await fs.write(rulePath, JSON.stringify(data, null, 2));
+    new Notice(`Rule added: ${tagToAdd} → ${dir}`);
   } else {
-    new Notice(`Rule already exists for #pjt_${slug}`);
+    new Notice(`Rule already exists for ${tagToAdd}`);
   }
 };
