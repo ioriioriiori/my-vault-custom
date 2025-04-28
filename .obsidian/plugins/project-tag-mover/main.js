@@ -4,7 +4,7 @@ const obsidian_1 = require("obsidian");
 
 class ProjectTagMover extends obsidian_1.Plugin {
     async onload() {
-        console.log("ProjectTagMover (final-final version) loading...");
+        console.log("ProjectTagMover (content parser version) loading...");
         await this.loadSettings();
         this.addSettingTab(new ProjectTagMoverSettingTab(this.app, this));
 
@@ -28,48 +28,27 @@ class ProjectTagMover extends obsidian_1.Plugin {
             return;
         }
 
-        const metadata = this.app.metadataCache.getFileCache(file);
-        if (!metadata) {
-            new obsidian_1.Notice("No metadata found.");
-            return;
-        }
+        try {
+            const content = await this.app.vault.read(file);
 
-        let allTags = [];
+            // 本文から #pjt/xxx を正規表現で拾う
+            const regex = new RegExp(`${this.settings.tagPrefix.replace("/", "\\/")}[^\s#]+`);
+            const match = content.match(regex);
 
-        // 本文中のtags
-        if (metadata.tags) {
-            allTags.push(...metadata.tags.map(t => t.tag));
-        }
-
-        // frontmatter内のtags
-        if (metadata.frontmatter && metadata.frontmatter.tags) {
-            const fmTags = metadata.frontmatter.tags;
-            if (Array.isArray(fmTags)) {
-                allTags.push(...fmTags);
-            } else if (typeof fmTags === "string") {
-                allTags.push(fmTags);
+            if (!match) {
+                new obsidian_1.Notice("No matching project tag found in content.");
+                return;
             }
+
+            const fullTag = match[0];
+            const relativePath = fullTag.substring(this.settings.tagPrefix.length);
+
+            await this.moveFileToProject(file, relativePath);
+
+        } catch (e) {
+            console.error("Error reading file content:", e);
+            new obsidian_1.Notice("Failed to read file content.");
         }
-
-        console.log("Collected tags:", allTags);
-
-        let projectTag = null;
-        for (const tag of allTags) {
-            if (typeof tag !== "string") continue;
-            const cleanTag = tag.replace(/^["']|["']$/g, ""); // 両端のクォーテーションを除去
-            if (cleanTag.startsWith(this.settings.tagPrefix)) {
-                projectTag = cleanTag;
-                break;
-            }
-        }
-
-        if (!projectTag) {
-            new obsidian_1.Notice("No matching project tag found.");
-            return;
-        }
-
-        const relativePath = projectTag.substring(this.settings.tagPrefix.length);
-        await this.moveFileToProject(file, relativePath);
     }
 
     async moveFileToProject(file, relativePath) {
@@ -92,7 +71,7 @@ class ProjectTagMover extends obsidian_1.Plugin {
     }
 
     onunload() {
-        console.log("ProjectTagMover (final-final version) unloaded.");
+        console.log("ProjectTagMover (content parser version) unloaded.");
     }
 
     async loadSettings() {
