@@ -1,0 +1,10 @@
+{
+    "scanOnSave": true,
+    "mappings": {
+      "#Concept":    "03_projects/Concept",
+      "#RuleSpec":   "03_projects/RuleSpec",
+      "#TestPlay":   "03_projects/TestPlay",
+      "#Spec":       "03_projects/Spec"
+    }
+  }
+  
