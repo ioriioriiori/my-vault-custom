@@ -35,6 +35,8 @@
   "enabled_templates_hotkeys": [
     "00_templates/10_current_time.md"
   ],
-  "startup_templates": [],
+  "startup_templates": [
+    "05/start_tag_router_listener.js"
+  ],
   "intellisense_render": 1
 }
