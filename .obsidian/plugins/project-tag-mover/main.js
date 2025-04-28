@@ -4,7 +4,7 @@ const obsidian_1 = require("obsidian");
 
 class ProjectTagMover extends obsidian_1.Plugin {
     async onload() {
-        console.log("ProjectTagMover (command, frontmatter対応版) loading...");
+        console.log("ProjectTagMover (no folder restriction version) loading...");
         await this.loadSettings();
         this.addSettingTab(new ProjectTagMoverSettingTab(this.app, this));
 
@@ -25,11 +25,6 @@ class ProjectTagMover extends obsidian_1.Plugin {
         }
         if (!file.path.endsWith(".md")) {
             new obsidian_1.Notice("Not a markdown file.");
-            return;
-        }
-
-        if (!file.path.startsWith("02_note/")) {
-            new obsidian_1.Notice("Only files under '02_note/' can be moved.");
             return;
         }
 
@@ -84,7 +79,7 @@ class ProjectTagMover extends obsidian_1.Plugin {
     }
 
     onunload() {
-        console.log("ProjectTagMover (command, frontmatter対応版) unloaded.");
+        console.log("ProjectTagMover (no folder restriction version) unloaded.");
     }
 
     async loadSettings() {
