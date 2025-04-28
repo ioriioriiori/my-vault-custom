@@ -270,7 +270,7 @@
       "enabled": false
     }
   },
-  "lintOnSave": true,
+  "lintOnSave": false,
   "recordLintOnSaveLogs": false,
   "displayChanged": false,
   "lintOnFileChange": false,
@@ -284,7 +284,7 @@
     {
       "id": null,
       "name": "",
-      "enabled": true
+      "enabled": false
     }
   ],
   "customRegexes": [],

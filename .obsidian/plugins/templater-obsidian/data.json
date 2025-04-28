@@ -31,7 +31,7 @@
     "00_templates/tag_router_template.md"
   ],
   "startup_templates": [
-    ""
+    "00_templates/tag_router_template.md"
   ],
   "intellisense_render": 1
 }
