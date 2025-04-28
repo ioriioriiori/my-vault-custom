@@ -1,6 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const obsidian_1 = require("obsidian");
+const {
+  Plugin,
+  Notice,
+  parseYaml,
+  PluginSettingTab,
+  Setting,
+  TFile
+} = require("obsidian");
 
 /* ---------- デフォルト設定 ---------- */
 const DEFAULT_SETTINGS = {
@@ -9,10 +16,9 @@ const DEFAULT_SETTINGS = {
 };
 
 /* ---------- プラグイン本体 ---------- */
-class ProjectTagMover extends obsidian_1.Plugin {
-  /* 起動時 */
+class ProjectTagMover extends Plugin {
   async onload() {
-    console.log("ProjectTagMover (front-matter & body版) loading…");
+    console.log("ProjectTagMover (header+body parse version) loading…");
     await this.loadSettings();
     this.addSettingTab(new ProjectTagMoverSettingTab(this.app, this));
 
@@ -24,31 +30,30 @@ class ProjectTagMover extends obsidian_1.Plugin {
     });
   }
 
-  /* アクティブファイルを処理 */
   async moveActiveFile() {
     const file = this.app.workspace.getActiveFile();
-    if (!file || !file.path.endsWith(".md")) {
-      new obsidian_1.Notice("アクティブな Markdown ファイルがありません。");
+    if (!(file instanceof TFile) || !file.path.endsWith(".md")) {
+      new Notice("アクティブな Markdown ファイルがありません。");
       return;
     }
 
-    /* 1. ファイル内容を取得 */
     let content;
     try {
       content = await this.app.vault.read(file);
     } catch (e) {
-      console.error("読み込み失敗:", e);
-      new obsidian_1.Notice("ファイル読込に失敗しました。");
+      console.error("ファイル読み込み失敗:", e);
+      new Notice("ファイル読込に失敗しました。");
       return;
     }
 
-    /* 2. フロントマターから tags を抽出 */
     const tags = [];
+
+    /* 1) ヘッダー (YAML frontmatter) から tags: を抽出 */
     const fmMatch = content.match(/^---\s*\n([\s\S]*?)\n---/);
     if (fmMatch) {
       try {
-        const fmObj = (0, obsidian_1.parseYaml)(fmMatch[1]);
-        if (fmObj.tags) {
+        const fmObj = parseYaml(fmMatch[1]);
+        if (fmObj && fmObj.tags) {
           const fmTags = Array.isArray(fmObj.tags) ? fmObj.tags : [fmObj.tags];
           tags.push(...fmTags.map(t => String(t)));
         }
@@ -57,17 +62,24 @@ class ProjectTagMover extends obsidian_1.Plugin {
       }
     }
 
-    /* 3. 本文から #pjt/… を抽出（フロントマター部を除外） */
+    /* 2) 本文部から #pjt/xxx を正規表現で抽出 */
     const body = fmMatch ? content.slice(fmMatch[0].length) : content;
     const prefixEsc = this.settings.tagPrefix.replace("/", "\\/");
     const bodyRegex = new RegExp(`${prefixEsc}[^\\s#]+`, "g");
     const bodyMatches = body.match(bodyRegex);
-    if (bodyMatches) tags.push(...bodyMatches);
+    if (bodyMatches) {
+      tags.push(...bodyMatches);
+    }
 
-    /* 4. 最初に見つかった #pjt/ タグを使用 */
-    const first = tags.find(t => t.startsWith(this.settings.tagPrefix));
+    console.log("検出したタグリスト:", tags);
+
+    /* 3) 最初にマッチしたものを採用 */
+    const first = tags
+      .map(t => t.replace(/^["']|["']$/g, ""))  // 両端のクォート剥がし
+      .find(t => t.startsWith(this.settings.tagPrefix));
+
     if (!first) {
-      new obsidian_1.Notice("対応する #pjt タグが見つかりません。");
+      new Notice("対応する #pjt タグが見つかりません。");
       return;
     }
 
@@ -75,7 +87,6 @@ class ProjectTagMover extends obsidian_1.Plugin {
     await this.moveFileToProject(file, relativePath);
   }
 
-  /* 5. ファイルを指定フォルダへ移動 */
   async moveFileToProject(file, relativePath) {
     const targetPath = `${this.settings.rootFolder}/${relativePath}/${file.name}`;
     const folderPath = targetPath.substring(0, targetPath.lastIndexOf("/"));
@@ -85,20 +96,18 @@ class ProjectTagMover extends obsidian_1.Plugin {
         await this.app.vault.adapter.mkdir(folderPath);
       }
       await this.app.fileManager.renameFile(file, targetPath);
-      new obsidian_1.Notice(`Moved to '${targetPath}'`);
+      new Notice(`Moved to '${targetPath}'`);
       console.log(`Moved '${file.path}' → '${targetPath}'`);
     } catch (e) {
       console.error("移動失敗:", e);
-      new obsidian_1.Notice("ファイル移動に失敗しました。");
+      new Notice("ファイル移動に失敗しました。");
     }
   }
 
-  /* 終了処理 */
   onunload() {
     console.log("ProjectTagMover unloaded.");
   }
 
-  /* 設定ロード／保存 */
   async loadSettings() {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
   }
@@ -109,7 +118,7 @@ class ProjectTagMover extends obsidian_1.Plugin {
 exports.default = ProjectTagMover;
 
 /* ---------- 設定画面 ---------- */
-class ProjectTagMoverSettingTab extends obsidian_1.PluginSettingTab {
+class ProjectTagMoverSettingTab extends PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
     this.plugin = plugin;
@@ -120,7 +129,7 @@ class ProjectTagMoverSettingTab extends obsidian_1.PluginSettingTab {
     containerEl.empty();
     containerEl.createEl("h2", { text: "Project Tag Mover Settings" });
 
-    new obsidian_1.Setting(containerEl)
+    new Setting(containerEl)
       .setName("Tag Prefix")
       .setDesc("タグ判定に使う接頭辞（例: #pjt/）")
       .addText(t => t
@@ -131,7 +140,7 @@ class ProjectTagMoverSettingTab extends obsidian_1.PluginSettingTab {
           await this.plugin.saveSettings();
         }));
 
-    new obsidian_1.Setting(containerEl)
+    new Setting(containerEl)
       .setName("Root Folder")
       .setDesc("プロジェクトフォルダを作成する親ディレクトリ")
       .addText(t => t
