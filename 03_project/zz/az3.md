@@ -1,8 +1,8 @@
 ---
 tags:
   - note
-  - pjt/atoz
-  - pjt/a
+  - "#pjt/zz"
+  - diary
 ---
 > [!IMPORTANT]
 > [[企画書の書き方]]を参照の下、企画書を書くこと。
